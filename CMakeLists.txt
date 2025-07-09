@@ -46,18 +46,6 @@
 cmake_minimum_required(VERSION 3.7...3.16 FATAL_ERROR)
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
 
-set(
-    ROGII_FOLDER_PATH
-    "${CMAKE_CURRENT_LIST_DIR}/rogii"
-)
-include(${ROGII_FOLDER_PATH}/npm/Include.cmake)
-include(${ROGII_FOLDER_PATH}/environment.cmake)
-
-CNPM_PREPARE_PACKAGES(
-    DEFAULT_REPOSITORY_URLS
-    "$ENV{CNPM_URLS}"
-)
-
 # Collect command-line arguments for buildinfo.txt.
 # Must reside at the top of the script to work as expected.
 set(_cmake_args "")

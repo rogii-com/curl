@@ -74,54 +74,78 @@ set(
     ${ROOT}/${PACKAGE_NAME}
 )
 
+set(COMMON_BUILD_OPT
+    # -DBUILD_SHARED_LIBS=OFF
+    # -DBUILD_STATIC_LIBS=ON
+    -DBUILD_CURL_EXE=OFF
+    -DBUILD_TESTING=OFF
+    -DCURL_USE_LIBPSL=OFF
+    -DBUILD_EXAMPLES=OFF
+    -DBUILD_LIBCURL_DOCS=OFF
+    -DBUILD_MISC_DOCS=OFF
+    -DENABLE_CURL_MANUAL=OFF
+    -DCMAKE_DEBUG_POSTFIX=d
+)
+
 set(
-    BUILD_PATH
-    "${PROJECT_ROOT_PATH}/build"
+    DEBUG_PATH
+    "${CMAKE_CURRENT_LIST_DIR}/../build/debug_${ARCH}"
 )
 
 file(
     MAKE_DIRECTORY
-    "${BUILD_PATH}"
+    "${DEBUG_PATH}"
 )
 
 execute_process(
     COMMAND
-        ${CMAKE_COMMAND} -G Ninja -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} ${PROJECT_ROOT_PATH}
+        "${CMAKE_COMMAND}" -G Ninja -DCMAKE_BUILD_TYPE=Debug ${COMMON_BUILD_OPT} -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} ../..
     WORKING_DIRECTORY
-        ${BUILD_PATH}
+        "${DEBUG_PATH}"
 )
 
 execute_process(
     COMMAND
-        ${CMAKE_COMMAND} --build . --target build_target
+        "${CMAKE_COMMAND}" --build . --target install
     WORKING_DIRECTORY
-        ${BUILD_PATH}
+        "${DEBUG_PATH}"
 )
 
-# if(UNIX)
-#     execute_process(
-#         COMMAND
-#             bash -c "rm -rf *.a"
-#         WORKING_DIRECTORY
-#             "${CMAKE_INSTALL_PREFIX}/lib"
-#     )
-#     execute_process(
-#         COMMAND
-#             bash -c "rm -rf *.so"
-#         WORKING_DIRECTORY
-#             "${CMAKE_INSTALL_PREFIX}/lib"
-#     )
+set(
+    RELEASE_PATH
+    "${CMAKE_CURRENT_LIST_DIR}/../build/release_${ARCH}"
+)
 
-#     file(GLOB files "${CMAKE_INSTALL_PREFIX}/lib/*.so*")
-#     foreach(file ${files})
-#         execute_process(
-#             COMMAND
-#                 bash ${ROGII_FOLDER_PATH}/utils/split_debug_info.sh "${file}"
-#             WORKING_DIRECTORY
-#                 "${CMAKE_INSTALL_PREFIX}/lib"
-#         )
-#     endforeach()
-# endif()
+file(
+    MAKE_DIRECTORY
+    "${RELEASE_PATH}"
+)
+
+execute_process(
+    COMMAND
+        "${CMAKE_COMMAND}" -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo ${COMMON_BUILD_OPT} -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} ../..
+    WORKING_DIRECTORY
+        "${RELEASE_PATH}"
+)
+
+execute_process(
+    COMMAND
+        "${CMAKE_COMMAND}" --build . --target install
+    WORKING_DIRECTORY
+        "${RELEASE_PATH}"
+)
+
+if(UNIX)
+    file(GLOB files "${CMAKE_INSTALL_PREFIX}/lib/*.so*")
+    foreach(file ${files})
+        execute_process(
+            COMMAND
+                bash ${ROGII_FOLDER_PATH}/utils/split_debug_info.sh "${file}"
+            WORKING_DIRECTORY
+                "${CMAKE_INSTALL_PREFIX}/lib"
+        )
+    endforeach()
+endif()
 
 file(
     COPY
@@ -132,7 +156,8 @@ file(
 
 file(
     REMOVE_RECURSE
-    "${BUILD_PATH}"
+    "${DEBUG_PATH}"
+    "${RELEASE_PATH}"
 )
 
 execute_process(
