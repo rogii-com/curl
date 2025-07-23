@@ -3,7 +3,6 @@ if(TARGET libcurl)
 endif()
 
 add_library(libcurl STATIC IMPORTED)
-add_library(CURL::libcurl_static ALIAS libcurl)
 
 if(MSVC)
     set_target_properties(
