@@ -8,6 +8,8 @@ if(MSVC)
     set_target_properties(
         libcurl
         PROPERTIES
+            INTERFACE_COMPILE_DEFINITIONS
+                "CURL_STATICLIB"
             IMPORTED_LOCATION
                 "${CMAKE_CURRENT_LIST_DIR}/lib/libcurl.lib"
             IMPORTED_LOCATION_DEBUG
@@ -19,6 +21,8 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set_target_properties(
         libcurl
         PROPERTIES
+            INTERFACE_COMPILE_DEFINITIONS
+                "CURL_STATICLIB"
             IMPORTED_LOCATION
                 "${CMAKE_CURRENT_LIST_DIR}/lib/libcurl.a"
             IMPORTED_LOCATION_DEBUG
