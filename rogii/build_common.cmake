@@ -75,8 +75,8 @@ set(
 )
 
 set(COMMON_BUILD_OPT
-    # -DBUILD_SHARED_LIBS=OFF
-    # -DBUILD_STATIC_LIBS=ON
+    -DBUILD_SHARED_LIBS=OFF
+    -DBUILD_STATIC_LIBS=ON
     -DBUILD_CURL_EXE=OFF
     -DBUILD_TESTING=OFF
     -DCURL_USE_LIBPSL=OFF
@@ -160,11 +160,11 @@ file(
         "${CMAKE_INSTALL_PREFIX}"
 )
 
-file(
-    REMOVE_RECURSE
-    "${DEBUG_PATH}"
-    "${RELEASE_PATH}"
-)
+# file(
+#     REMOVE_RECURSE
+#     "${DEBUG_PATH}"
+#     "${RELEASE_PATH}"
+# )
 
 execute_process(
     COMMAND
