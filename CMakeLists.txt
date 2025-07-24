@@ -84,7 +84,27 @@ message(STATUS "curl version=[${_curl_version}]")
 string(REGEX REPLACE "([0-9]+\.[0-9]+\.[0-9]+).+" "\\1" _curl_version_sem "${_curl_version}")
 project(CURL
   VERSION "${_curl_version_sem}"
-  LANGUAGES C)
+  LANGUAGES C CXX)
+
+
+include(${PROJECT_SOURCE_DIR}/rogii/npm/Include.cmake)
+include(${PROJECT_SOURCE_DIR}/rogii/environment.cmake)
+CNPM_PREPARE_PACKAGES(DEFAULT_REPOSITORY_URLS "$ENV{CNPM_URLS}")
+
+if(WIN32)
+  if(TARGET ZLib::library)
+    get_target_property(Z_LIB_INC ZLib::library INTERFACE_INCLUDE_DIRECTORIES)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+      get_target_property(Z_LIB_PATH ZLib::library IMPORTED_LOCATION_DEBUG)
+    else()
+      get_target_property(Z_LIB_PATH ZLib::library IMPORTED_LOCATION)
+    endif()
+  
+    set(ZLIB_LIBRARY ${Z_LIB_PATH})
+    set(ZLIB_INCLUDE_DIR ${Z_LIB_INC})
+  endif()
+endif()
+
 
 # CMake does not recognize some targets accurately. Touch up configuration manually as a workaround.
 if(WINDOWS_STORE AND MINGW)  # mingw UWP build
