@@ -2522,3 +2522,27 @@ file(WRITE "${PROJECT_BINARY_DIR}/buildinfo.txt" "# This is a generated file.  D
 if(NOT "$ENV{CURL_BUILDINFO}$ENV{CURL_CI}$ENV{CI}" STREQUAL "")
   message(STATUS "\n${_buildinfo}")
 endif()
+
+# Workaround, target libcurl_object is private
+set(LIB_OBJECT_PDB libcurl_object)
+
+if(MSVC)
+  target_compile_options(${LIB_OBJECT_PDB} PRIVATE "/Zi" "/FS")
+  target_link_options(${LIB_OBJECT_PDB} PRIVATE "/DEBUG")
+  
+  set(PDB_NAME "${LIBCURL_OUTPUT_NAME}")
+  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(PDB_NAME "${PDB_NAME}${CMAKE_DEBUG_POSTFIX}")
+  endif()
+  
+  set_target_properties(${LIB_OBJECT_PDB} PROPERTIES
+    PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pdbs"
+    COMPILE_PDB_NAME "${PDB_NAME}"
+  )
+
+  install(FILES 
+    "${CMAKE_BINARY_DIR}/pdbs/${PDB_NAME}.pdb"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    OPTIONAL
+  )
+endif()
